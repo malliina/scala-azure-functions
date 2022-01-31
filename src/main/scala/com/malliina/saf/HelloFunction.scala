@@ -9,6 +9,7 @@ import scala.annotation.StaticAnnotation
 object HelloFunction:
   final val name = "HelloFunction"
   final val triggerName = "req"
+  final val entryMethod = "run"
 
 class HelloFunction:
   @FunctionName(HelloFunction.name)

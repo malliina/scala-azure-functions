@@ -9,17 +9,22 @@ import java.nio.file.{Files, Path, Paths, StandardCopyOption, StandardOpenOption
 object FunctionBuilder:
   val log = AppLogger(getClass)
 
-  def main(args: Array[String]): Unit = packageFunction(Paths.get(args.head), Paths.get(args(1)))
+  def main(args: Array[String]): Unit =
+    args.toList match
+      case dir :: jar :: Nil =>
+        packageFunction(Paths.get(dir), Paths.get(jar))
+      case other =>
+        val msg = s"Expected three parameters, got ${other.length}: ${other.mkString(", ")}"
+        throw new IllegalArgumentException(msg)
 
   def packageFunction(targetDir: Path, functionJar: Path): Unit =
-//    val hm = getAnnotations[HelloFunction]
     log.info(s"Packaging function...")
     Files.createDirectories(targetDir)
     val distJar = targetDir.resolve(functionJar.getFileName)
     Files.copy(functionJar, distJar, StandardCopyOption.REPLACE_EXISTING)
     log.info(s"Copied $functionJar to $distJar.")
     val entryClass = classOf[HelloFunction].getName
-    val entryMethod = "run"
+    val entryMethod = HelloFunction.entryMethod
     val jsonDir = targetDir.resolve(HelloFunction.name)
     Files.createDirectories(jsonDir)
     val relativeJar = jsonDir.relativize(distJar)
@@ -42,6 +47,7 @@ object FunctionBuilder:
       targetDir.resolve("local.settings.json"),
       StandardCopyOption.REPLACE_EXISTING
     )
+    Zip.zipFolder(targetDir)
 
   def functionJson(triggerName: String, functionJarPath: Path, entryPoint: String): FunctionJson =
     FunctionJson(
