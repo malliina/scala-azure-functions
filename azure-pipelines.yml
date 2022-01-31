@@ -1,0 +1,31 @@
+trigger:
+  branches:
+    include:
+      - master
+
+pr: none
+
+pool:
+  vmImage: 'Ubuntu 18.04'
+
+variables:
+  # Azure service connection established during pipeline creation
+  azureSubscription: <Name of your Azure subscription>
+  appName: <Name of the function app>
+
+steps:
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '11'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+
+  - script: sbt build
+    displayName: 'Package app'
+
+  - task: AzureFunctionApp@1
+    inputs:
+      azureSubscription: $(azureSubscription)
+      appType: functionAppLinux
+      appName: $(appName)
+      package: $(System.ArtifactsDirectory)/target/azure.zip
