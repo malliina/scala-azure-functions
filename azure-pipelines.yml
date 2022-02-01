@@ -28,4 +28,4 @@ steps:
       azureSubscription: $(azureSubscription)
       appType: functionAppLinux
       appName: $(appName)
-      package: $(System.ArtifactsDirectory)/target/azure.zip
+      package: $(System.DefaultWorkingDirectory)/target/azure.zip
