@@ -15,7 +15,7 @@ class HelloFunction:
   @FunctionName(HelloFunction.name)
   def run(
     @HttpTrigger(name = HelloFunction.triggerName)
-    request: HttpRequestMessage[Optional[String]],
+    request: HttpRequestMessage[Option[String]],
     context: ExecutionContext
   ): HttpResponseMessage =
     val name = Option(request.getQueryParameters.get("name")).getOrElse("unnamed")
