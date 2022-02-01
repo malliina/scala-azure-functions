@@ -3,7 +3,6 @@ package com.malliina.saf
 import com.microsoft.azure.functions.annotation.{FunctionName, HttpTrigger}
 import com.microsoft.azure.functions.{ExecutionContext, HttpRequestMessage, HttpResponseMessage, HttpStatus}
 
-import java.util.Optional
 import scala.annotation.StaticAnnotation
 
 object HelloFunction:

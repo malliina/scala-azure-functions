@@ -37,17 +37,13 @@ object FunctionBuilder:
       StandardOpenOption.CREATE
     )
     log.info(s"Wrote $functionJsonFile.")
-    Files.copy(
-      getClass.getResourceAsStream("host.json"),
-      targetDir.resolve("host.json"),
-      StandardCopyOption.REPLACE_EXISTING
-    )
-    Files.copy(
-      getClass.getResourceAsStream("local.settings.json"),
-      targetDir.resolve("local.settings.json"),
-      StandardCopyOption.REPLACE_EXISTING
-    )
+    copyResource("host.json", targetDir.resolve("host.json"))
+    copyResource("local.settings.json", targetDir.resolve("local.settings.json"))
     Zip.zipFolder(targetDir)
+
+  private def copyResource(file: String, to: Path): Unit =
+    Files.copy(getClass.getResourceAsStream(file), to, StandardCopyOption.REPLACE_EXISTING)
+    log.info(s"Wrote $to.")
 
   def functionJson(triggerName: String, functionJarPath: Path, entryPoint: String): FunctionJson =
     FunctionJson(
