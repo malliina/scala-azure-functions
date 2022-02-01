@@ -66,6 +66,7 @@ resource azureFunction 'Microsoft.Web/sites@2020-12-01' = {
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
+    reserved: false
     siteConfig: {
       appSettings: [
         {
@@ -94,5 +95,38 @@ resource azureFunction 'Microsoft.Web/sites@2020-12-01' = {
         }
       ]
     }
+  }
+}
+
+param hostname string = 'saf.malliina.site'
+
+resource siteCustomDomain 'Microsoft.Web/sites/hostNameBindings@2021-02-01' = {
+  name: '${azureFunction.name}/${hostname}'
+  properties: {
+    hostNameType: 'Verified'
+    sslState: 'Disabled'
+    customHostNameDnsRecordType: 'CName'
+    siteName: azureFunction.name
+  }
+}
+
+resource certificate 'Microsoft.Web/certificates@2021-02-01' = {
+  name: hostname
+  location: location
+  dependsOn: [
+    siteCustomDomain
+  ]
+  properties: {
+    canonicalName: hostname
+    serverFarmId: appServicePlan.id
+  }
+}
+
+module siteEnableSni 'sni-enable.bicep' = {
+  name: '${deployment().name}-${azureFunction.name}-sni-enable'
+  params: {
+    certificateThumbprint: certificate.properties.thumbprint
+    hostname: hostname
+    siteName: azureFunction.name
   }
 }
